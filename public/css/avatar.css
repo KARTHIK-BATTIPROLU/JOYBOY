@@ -1,0 +1,413 @@
+/* ==========================================================================
+   Project JOYBOY — Milestone 2
+   Red Hair Shanks 2D Vector Avatar Stylesheet & 60 FPS GPU Animations
+   Target: public/css/avatar.css
+   ========================================================================== */
+
+:root {
+  /* Hair Tones */
+  --shanks-hair-base:       #B22222;  /* Vivid Crimson Base */
+  --shanks-hair-shadow:     #7A1215;  /* Deep Hair Underside Shadow */
+  --shanks-hair-highlight:  #DC143C;  /* Upper Strand Sheen */
+  --shanks-hair-deep:       #52090B;  /* Background Root Shadow */
+
+  /* Skin & Anatomy */
+  --shanks-skin-base:       #F2CEAE;  /* Tanned Pirate Skin */
+  --shanks-skin-shadow:     #D4A882;  /* Neck & Jaw Occlusion Shadow */
+  --shanks-skin-highlight:  #FAECD8;  /* Nose Bridge & Cheek Light */
+  --shanks-stubble:         #684A3B;  /* 5 o'clock Shadow & Jaw Scruff */
+
+  /* Scars (3 Diagonal Claws) */
+  --shanks-scar-base:       #A83236;  /* Three Claw Scars */
+  --shanks-scar-dark:       #611417;  /* Scar Center Crease */
+  --shanks-scar-flesh:      #CB6D6F;  /* Scar Healed Border Highlight */
+
+  /* Eyes */
+  --shanks-eye-sclera:      #F5F5FA;  /* Eye White */
+  --shanks-eye-sclera-shd:  #D5D5E0;  /* Upper Eyelid Shadow */
+  --shanks-eye-iris:        #1A110C;  /* Piercing Dark Amber-Black */
+  --shanks-eye-amber:       #A35415;  /* Inner Iris Amber Ring */
+  --shanks-eye-pupil:       #0A0604;  /* Deep Pupil */
+  --shanks-eye-specular:    #FFFFFF;  /* Glint Specular Light */
+
+  /* Clothing & Cape */
+  --shanks-cape-black:      #18181D;  /* Deep Charcoal Cloak Outer */
+  --shanks-cape-shadow:     #0D0D10;  /* Cloak Underfold Shadow */
+  --shanks-cape-lining:     #521014;  /* Dark Crimson Cloak Interior Lining */
+  --shanks-shirt-white:     #F3EFE6;  /* Weathered Pirate Shirt Fabric */
+  --shanks-shirt-shadow:    #CDC5B4;  /* Shirt Crease & Fold Shadow */
+  --shanks-sash-crimson:    #82161A;  /* Waist Sash Primary */
+  --shanks-sash-shadow:     #4E0C0F;  /* Sash Tie Fold Shadow */
+
+  /* Gryphon Saber & Metallic Accents */
+  --shanks-gold-brass:      #D4AF37;  /* Gryphon Guard & Cape Clasp */
+  --shanks-gold-shadow:     #8C6F19;  /* Brass Shadow */
+  --shanks-steel-blade:     #B8C0C8;  /* Saber Sheath Fitting */
+  --shanks-leather-wrap:    #2C1A14;  /* Saber Hilt Grip Wrap */
+
+  /* Conqueror's Haki Electric Glow */
+  --haki-crimson-core:      #FF1E40;  /* Haoshoku Haki Electric Core */
+  --haki-crimson-aura:      rgba(255, 30, 64, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   Container & Canvas Layout Tokens
+   -------------------------------------------------------------------------- */
+
+#shanks-avatar-container,
+.shanks-avatar-container,
+#avatarContainer {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  aspect-ratio: 400 / 460;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  overflow: visible;
+}
+
+#shanks-avatar-svg,
+.shanks-avatar-svg,
+.shanks-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+  transition: filter 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+  transform-origin: 200px 300px;
+}
+
+#shanks-haki-canvas,
+.shanks-haki-canvas,
+#hakiCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* --------------------------------------------------------------------------
+   11 Semantic Groups & Hardware Acceleration Declarations
+   -------------------------------------------------------------------------- */
+
+#layer-shadow,
+#layer-cape-back,
+#layer-body,
+#layer-right-arm,
+#layer-head,
+#layer-eyes,
+#layer-nose,
+#layer-mouth-group,
+#layer-hair-front,
+#layer-cape-front {
+  display: block;
+}
+
+#layer-head,
+#layer-body,
+#layer-cape-back,
+#layer-cape-front,
+#layer-right-arm,
+#hair-mass-left,
+#hair-mass-right,
+.eyelid-wrapper,
+#layer-mouth-group {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Viseme Display Rules (Sub-Millisecond Zero-Relayout Switching)
+   -------------------------------------------------------------------------- */
+
+#layer-mouth-group .viseme {
+  display: none;
+}
+
+#layer-mouth-group.viseme-closed #viseme-closed,
+.viseme-closed #viseme-closed {
+  display: block;
+}
+
+#layer-mouth-group.viseme-narrow #viseme-narrow,
+.viseme-narrow #viseme-narrow {
+  display: block;
+}
+
+#layer-mouth-group.viseme-round #viseme-round,
+.viseme-round #viseme-round {
+  display: block;
+}
+
+#layer-mouth-group.viseme-open #viseme-open,
+.viseme-open #viseme-open {
+  display: block;
+}
+
+#layer-mouth-group.viseme-laugh #viseme-laugh,
+.viseme-laugh #viseme-laugh {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Blinking Mechanics
+   -------------------------------------------------------------------------- */
+
+.eyelid-wrapper {
+  transform: scaleY(0);
+  transition: transform 0.05s ease-in;
+}
+
+.is-blinking .eyelid-wrapper,
+.shanks-avatar-container.is-blinking .eyelid-wrapper,
+#shanks-avatar-container.is-blinking .eyelid-wrapper,
+.avatar-container.is-blinking .eyelid-wrapper {
+  transform: scaleY(1);
+}
+
+/* --------------------------------------------------------------------------
+   State 1: IDLE Animation Rules
+   -------------------------------------------------------------------------- */
+
+.state-idle #layer-body,
+.state-idle #layer-right-arm,
+[data-state="idle"] #layer-body,
+[data-state="idle"] #layer-right-arm,
+[data-state="IDLE"] #layer-body,
+[data-state="IDLE"] #layer-right-arm {
+  animation: shanks-breathe-body 3.6s ease-in-out infinite;
+}
+
+.state-idle #layer-head,
+[data-state="idle"] #layer-head,
+[data-state="IDLE"] #layer-head {
+  animation: shanks-breathe-head 3.6s ease-in-out infinite;
+}
+
+@keyframes shanks-breathe-body {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -3.5px, 0) scaleY(1.008);
+  }
+}
+
+@keyframes shanks-breathe-head {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -2px, 0) rotate(0.4deg);
+  }
+}
+
+/* Hair Breeze Sway */
+.hair-wave-left {
+  transform-origin: 155px 105px;
+  animation: shanks-hair-sway-left 4.2s ease-in-out infinite;
+}
+
+.hair-wave-right {
+  transform-origin: 245px 105px;
+  animation: shanks-hair-sway-right 3.8s ease-in-out infinite 0.4s;
+}
+
+@keyframes shanks-hair-sway-left {
+  0%, 100% {
+    transform: rotate(0deg) skewX(0deg);
+  }
+  50% {
+    transform: rotate(-2.5deg) skewX(-1.2deg);
+  }
+}
+
+@keyframes shanks-hair-sway-right {
+  0%, 100% {
+    transform: rotate(0deg) skewX(0deg);
+  }
+  50% {
+    transform: rotate(2.8deg) skewX(1.5deg);
+  }
+}
+
+/* Cape Billowing in Ocean Wind */
+#layer-cape-back,
+#layer-cape-front {
+  transform-origin: 200px 300px;
+  animation: shanks-cape-billow 5s ease-in-out infinite;
+}
+
+@keyframes shanks-cape-billow {
+  0%, 100% {
+    transform: rotate(0deg) scaleX(1);
+  }
+  35% {
+    transform: rotate(-1.5deg) scaleX(1.02);
+  }
+  70% {
+    transform: rotate(1deg) scaleX(0.985);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   State 2: LISTENING / RECORDING Animation Rules
+   -------------------------------------------------------------------------- */
+
+.state-listening #shanks-avatar-svg,
+.state-listening .shanks-avatar-svg,
+.state-listening .shanks-svg,
+.state-recording #shanks-avatar-svg,
+.state-recording .shanks-avatar-svg,
+.state-recording .shanks-svg,
+[data-state="listening"] .shanks-svg,
+[data-state="RECORDING"] .shanks-svg {
+  transform: translate3d(0, 4px, 0) scale(1.02);
+  filter: drop-shadow(0 0 14px rgba(255, 30, 64, 0.6)) 
+          drop-shadow(0 0 28px rgba(186, 24, 27, 0.4))
+          drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+  animation: haki-aura-pulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes haki-aura-pulse {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(255, 30, 64, 0.4)) 
+            drop-shadow(0 0 20px rgba(186, 24, 27, 0.25))
+            drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 24px rgba(255, 30, 64, 0.85)) 
+            drop-shadow(0 0 45px rgba(220, 20, 60, 0.55))
+            drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+  }
+}
+
+/* Attentive Brow Furrow */
+.state-listening #eyebrow-right,
+.state-recording #eyebrow-right,
+[data-state="listening"] #eyebrow-right {
+  transform: translate3d(-1px, 2px, 0) rotate(-1.5deg);
+  transition: transform 0.25s ease;
+}
+
+.state-listening #eyebrow-left,
+.state-recording #eyebrow-left,
+[data-state="listening"] #eyebrow-left {
+  transform: translate3d(1px, 2px, 0) rotate(1.5deg);
+  transition: transform 0.25s ease;
+}
+
+.state-listening .hair-wave-left,
+.state-listening .hair-wave-right,
+.state-recording .hair-wave-left,
+.state-recording .hair-wave-right {
+  animation-duration: 2.5s;
+}
+
+/* --------------------------------------------------------------------------
+   State 3: SPEAKING Animation Rules
+   -------------------------------------------------------------------------- */
+
+.state-speaking #layer-head,
+[data-state="speaking"] #layer-head,
+[data-state="SPEAKING"] #layer-head {
+  animation: shanks-speaking-cadence 0.75s ease-in-out infinite alternate;
+}
+
+@keyframes shanks-speaking-cadence {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-0.6deg);
+  }
+  100% {
+    transform: translate3d(0, -3.5px, 0) rotate(0.8deg);
+  }
+}
+
+.state-speaking #layer-cape-back,
+.state-speaking #layer-cape-front,
+[data-state="speaking"] #layer-cape-back,
+[data-state="speaking"] #layer-cape-front {
+  animation-duration: 2.2s;
+}
+
+.state-speaking .hair-wave-left,
+.state-speaking .hair-wave-right,
+[data-state="speaking"] .hair-wave-left,
+[data-state="speaking"] .hair-wave-right {
+  animation-duration: 2.0s;
+}
+
+/* Special Laughter Dynamics ("Dahahaha!") */
+.state-speaking.viseme-laugh #layer-head,
+.viseme-laugh .state-speaking #layer-head,
+.state-speaking .viseme-laugh #layer-head,
+[data-state="speaking"].viseme-laugh #layer-head {
+  animation: shanks-laugh-head-bob 0.22s ease-in-out infinite alternate !important;
+}
+
+@keyframes shanks-laugh-head-bob {
+  0% {
+    transform: translate3d(0, 1px, 0) rotate(-1.5deg) scale(1);
+  }
+  100% {
+    transform: translate3d(0, -5.5px, 0) rotate(1.5deg) scale(1.018);
+  }
+}
+
+.state-speaking.viseme-laugh #eyebrow-right,
+.state-speaking.viseme-laugh #eyebrow-left,
+.viseme-laugh #eyebrow-right,
+.viseme-laugh #eyebrow-left {
+  transform: translate3d(0, -2.5px, 0);
+  transition: transform 0.1s ease;
+}
+
+/* --------------------------------------------------------------------------
+   State 4: PROCESSING Animation Rules
+   -------------------------------------------------------------------------- */
+
+.state-processing #shanks-avatar-svg,
+.state-processing .shanks-svg,
+[data-state="processing"] .shanks-svg,
+[data-state="PROCESSING"] .shanks-svg {
+  filter: drop-shadow(0 0 14px rgba(229, 179, 88, 0.5)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+  animation: log-pose-contemplate 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes log-pose-contemplate {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -2.5px, 0) rotate(-1deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0.6deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   State 5: ERROR Animation Rules
+   -------------------------------------------------------------------------- */
+
+.state-error #shanks-avatar-svg,
+.state-error .shanks-svg,
+[data-state="error"] .shanks-svg,
+[data-state="ERROR"] .shanks-svg {
+  filter: drop-shadow(0 0 16px rgba(186, 24, 27, 0.7)) grayscale(0.25);
+  animation: shanks-error-glitch 0.3s ease-in-out 3;
+}
+
+@keyframes shanks-error-glitch {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-2px, 1px, 0); }
+  75% { transform: translate3d(2px, -1px, 0); }
+}

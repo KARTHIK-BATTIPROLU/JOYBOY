@@ -18,3 +18,5 @@ Thumbs.db
 
 # Agent metadata
 .agents/
+
+.vercel
