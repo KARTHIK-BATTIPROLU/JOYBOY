@@ -1,0 +1,575 @@
+/* ==========================================================================
+   JOYBOY — Red Hair Shanks AI Voice Chatbot
+   Theme: Red Force Flagship / Grand Line Nautical Pirate Aesthetic
+   ========================================================================== */
+
+:root {
+  --bg-deep: #0a0c10;
+  --bg-wood: #14171e;
+  --bg-parchment: #1c202a;
+  --wood-grain: #1e1814;
+  --shanks-red: #d11a2a;
+  --shanks-crimson: #ff2a3d;
+  --haki-purple: #4a0033;
+  --haki-lightning: #ff0055;
+  --gold-accent: #e5b358;
+  --gold-glow: rgba(229, 179, 88, 0.3);
+  --text-primary: #f0ede6;
+  --text-secondary: #9ea4b0;
+  --text-muted: #5e6676;
+  --border-gold: rgba(229, 179, 88, 0.25);
+  --glass-bg: rgba(20, 23, 30, 0.75);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
+  --font-pirate: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(209, 26, 42, 0.12) 0%, transparent 60%),
+    radial-gradient(circle at 10% 80%, rgba(229, 179, 88, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, #0b0d12 0%, #11141b 100%);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* Background Atmosphere & Vignette */
+.ocean-ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 1;
+}
+
+/* App Header */
+.app-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-gold);
+  background: rgba(10, 12, 16, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.jolly-roger-icon {
+  width: 42px;
+  height: 42px;
+  filter: drop-shadow(0 0 8px rgba(209, 26, 42, 0.5));
+}
+
+.brand-title {
+  font-family: var(--font-pirate);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(229, 179, 88, 0.4);
+}
+
+.brand-subtitle {
+  font-size: 0.75rem;
+  color: var(--shanks-crimson);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.status-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.status-pill.recording .status-dot {
+  background: var(--shanks-crimson);
+  box-shadow: 0 0 10px var(--shanks-crimson);
+  animation: pulse-dot 1s infinite;
+}
+
+/* Main Layout Grid */
+.main-stage {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 75px);
+  overflow: hidden;
+}
+
+/* Left / Main Character Stage */
+.character-viewport {
+  flex: 1.2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem 2rem;
+  background: radial-gradient(circle at 50% 40%, rgba(209, 26, 42, 0.08) 0%, transparent 70%);
+}
+
+.avatar-container {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  height: 520px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#shanksAvatarSvg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8));
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Canvas VFX Overlay for Haki */
+#hakiCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Character Speech Bubble Toast */
+.speech-bubble-overlay {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 85%;
+  background: rgba(18, 22, 30, 0.92);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 0.9rem 1.4rem;
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(209, 26, 42, 0.2);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.speech-bubble-overlay.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.bubble-character-name {
+  font-family: var(--font-pirate);
+  font-size: 0.8rem;
+  color: var(--gold-accent);
+  margin-bottom: 0.3rem;
+  letter-spacing: 1px;
+}
+
+.bubble-dialogue-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Controls Deck */
+.interaction-deck {
+  width: 100%;
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.ptt-master-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-gold);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.action-btn:hover {
+  background: rgba(229, 179, 88, 0.15);
+  transform: translateY(-2px);
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 15px var(--gold-glow);
+}
+
+/* Push to Talk Primary Button */
+.ptt-button {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e62238 0%, #a80f1e 60%, #63050d 100%);
+  border: 3px solid var(--gold-accent);
+  box-shadow: 0 0 25px rgba(209, 26, 42, 0.6), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.ptt-button svg {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.ptt-button .ptt-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ptt-button:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 35px rgba(255, 42, 61, 0.8), inset 0 2px 8px rgba(255, 255, 255, 0.6);
+}
+
+.ptt-button:active,
+.ptt-button.recording {
+  transform: scale(0.96);
+  background: radial-gradient(circle at 35% 35%, #ff2a3d 0%, #c41324 60%, #87000e 100%);
+  border-color: #fff;
+  box-shadow: 0 0 45px rgba(255, 42, 61, 1), 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+.ptt-ripple-ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--shanks-crimson);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ptt-button.recording .ptt-ripple-ring {
+  animation: ripple-wave 1.2s infinite ease-out;
+}
+
+.ptt-hint-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.ptt-hint-text kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  color: var(--gold-accent);
+  font-family: inherit;
+}
+
+/* Fallback Text Input Deck */
+.text-input-console {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: rgba(20, 23, 30, 0.8);
+  border: 1px solid var(--border-gold);
+  border-radius: 9999px;
+  padding: 0.35rem 0.5rem 0.35rem 1.2rem;
+  backdrop-filter: blur(8px);
+}
+
+.text-input-console input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.text-input-console input::placeholder {
+  color: var(--text-muted);
+}
+
+.send-btn {
+  background: var(--gold-accent);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #12151c;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.send-btn:hover {
+  transform: scale(1.08);
+}
+
+/* Right Side: Captain's Log (Transcript Panel) */
+.transcript-drawer {
+  flex: 1;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-gold);
+  background: rgba(14, 17, 23, 0.92);
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 5;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid rgba(229, 179, 88, 0.15);
+}
+
+.drawer-title {
+  font-family: var(--font-pirate);
+  font-size: 1.15rem;
+  color: var(--gold-accent);
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clear-log-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.clear-log-btn:hover {
+  color: var(--shanks-crimson);
+}
+
+/* Messages Scroll Area */
+.messages-container {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  scroll-behavior: smooth;
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: rgba(229, 179, 88, 0.2);
+  border-radius: 4px;
+}
+
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 90%;
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+.message-bubble.user {
+  align-self: flex-end;
+  background: rgba(40, 48, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-bottom-right-radius: 2px;
+}
+
+.message-bubble.shanks {
+  align-self: flex-start;
+  background: rgba(30, 20, 22, 0.9);
+  border: 1px solid rgba(209, 26, 42, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border-bottom-left-radius: 2px;
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--gold-accent);
+}
+
+.message-meta .speaker-name {
+  font-family: var(--font-pirate);
+  letter-spacing: 0.5px;
+}
+
+.message-text {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.replay-audio-btn {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+  background: rgba(229, 179, 88, 0.1);
+  border: 1px solid var(--border-gold);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  color: var(--gold-accent);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.replay-audio-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+}
+
+/* Notification / Alert Banner */
+.alert-banner {
+  position: fixed;
+  top: 85px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(209, 26, 42, 0.92);
+  color: #fff;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 100;
+  display: none;
+}
+
+.alert-banner.visible {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+/* Animations */
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+@keyframes ripple-wave {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translate(-50%, -15px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .main-stage {
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+  }
+  .character-viewport {
+    height: 480px;
+    padding: 1rem;
+  }
+  .transcript-drawer {
+    max-width: 100%;
+    height: 380px;
+    border-left: none;
+    border-top: 1px solid var(--border-gold);
+  }
+}
